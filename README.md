@@ -2,6 +2,8 @@
 
 Elaboração de um projeto capaz de detectar e analisar soluções com a presença de Sal, a fim de utilizar a técnica de Voltametria Cíclica e coletar dados.
 
+200 uA  -> ~3.3V</br>
+-200 uA -> ~0V
 
 # Referências Bibliográficas
 
