@@ -186,38 +186,61 @@ Obs.: Os valores de corrente simulados para essa situação foram baseados no tr
 <td>Qnt.</td>
 <td>Produto</td>
 </tr>
+
 <tr>
 <td>1</td>
 <td>*Arduino Nano</td>
 </tr>
+
 <tr>
 <td>1</td>
 <td>*NodeMCU ESP32</td>
 </tr>
+
 <tr>
 <td>4</td>
 <td>LM239</td>
 </tr>
+
 <tr>
 <td>3</td>
 <td>
-<p>Resistor 4.7k</p>
+<p>Resistor 4.7kΩ</p>
 </td>
 </tr>
+
 <tr>
 <td>2</td>
-<td>Resistor 8.2k</td>
+<td>Resistor 8.2kΩ</td>
 </tr>
+
 <tr>
 <td>1</td>
 <td>
-<p>Pot&ecirc;nciometro 30k</p>
+<p>Pot&ecirc;nciometro 30kΩ</p>
 </td>
 </tr>
+
 <tr>
 <td>1</td>
 <td>Capacitor 10uF</td>
 </tr>
+
+<tr>
+<td>2</td>
+<td>Pin Header 2.54mm Single Row Female</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Conector T Block 3 pins</td>
+</tr>
+
+<tr>
+<td>1</td>
+<td>Conector T Block 2 pins</td>
+</tr>
+
 </tbody>
 </table>
     </div>
