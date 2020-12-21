@@ -143,7 +143,7 @@ void testFileIO(fs::FS &fs, const char * path){
         end = millis() - start;
         Serial.printf("- %u bytes read in %u ms\r\n", flen, end);
         file.close();
-    } else {
+    } else{
         Serial.println("- failed to open file for reading");
     }
 }
@@ -151,22 +151,41 @@ void testFileIO(fs::FS &fs, const char * path){
 void appendFileVoltammetry(fs::FS &fs, const char * path, const char * voltage, const char * current){
     //Serial.printf("Appending to file: %s\r\n", path);
 
+    if (verifyFile(fs, path)){
+        Serial.println("Arquivo já existe");
+        return;
+    }
+
     File file = fs.open(path, FILE_APPEND);
     if(!file){
         Serial.println("- failed to open file for appending");
         return;
     }
+
     String infoTemp = voltage + String("\n");
     if(file.print(infoTemp)){
         Serial.println("- message appended");
-    } else {
+    } else{
         Serial.println("- append failed");
     }
 
     String infoTemp = current + String("\n");
     if(file.print(String(infoTemp))){
         Serial.println("- message appended");
-    } else {
+    } else{
         Serial.println("- append failed");
+    }
+}
+
+// Verifica se arquivo já existe. Retorna true se já existe
+bool verifyFile(fs::FS &fs, const char * path){
+    Serial.printf("Reading file: %s\r\n", path);
+
+    File file = fs.open(path);
+    if(!file){
+        Serial.println("- failed to open file for reading");
+        return false;
+    }else{
+        return true;
     }
 }
