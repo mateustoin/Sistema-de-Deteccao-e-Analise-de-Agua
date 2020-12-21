@@ -225,7 +225,7 @@ Obs.: Os valores de corrente simulados para essa situação foram baseados no tr
 <p>Tabela 2. Lista de materiais utilizados no projeto</p>
 </div>
 
-<p><i>* Pode ser uma ou outra placa</i></p> 
+<p><i>* Pode ser uma ou outra placa</i></p>
 
 <h2 id="pcb">Placa de Circuito Impresso</h2>
 
@@ -247,41 +247,6 @@ Siga estas instruções para criar, replicar e modificar o modelo de app na sua 
 
 <h2 id="uso">Uso</h2>
 
-
->### Joystick Esquerdo
-> Cont
-
-<br/>
-
-> ### Joystick Direito
-> Segu
-
-<br/>
-
->### Botão TakeOff
->Faz o Drone sair do repouso e começar a voar.
-
-<br/>
-
-> ### Botão Land
-> Faz o Drone pousar.
-
-<br/>
-
-> ### Botão KeepAlive
-> Envia
-
-<br/>
-
-> ### Botão Increase Speed
-> Aumenta a velocidade do Drone
-
-<br/>
-
-> ### Botão Decrease Speed
-> Diminui a velocidade do Drone
-
-</p>
 
 <h1 id="referencias">Referências Bibliográficas</h1> 
 
