@@ -23,15 +23,13 @@ copies or substantial portions of the Software. -->
   </style>
 </head>
 <body>
-  <h2>ESP Weather Station</h2>
-  <div id="chart-temperature" class="container"></div>
-  <div id="chart-humidity" class="container"></div>
-  <div id="chart-pressure" class="container"></div>
+  <h2>ESP Cyclic Voltammetry</h2>
+  <div id="chart-voltammetry" class="container"></div>
 </body>
 <script>
 var chartT = new Highcharts.Chart({
-  chart:{ renderTo : 'chart-temperature' },
-  title: { text: 'BME280 Temperature' },
+  chart:{ renderTo : 'chart-voltammetry' },
+  title: { text: 'Cyclic Voltammetry' },
   series: [{
     showInLegend: false,
     data: []
@@ -42,11 +40,11 @@ var chartT = new Highcharts.Chart({
     },
     series: { color: '#059e8a' }
   },
-  xAxis: { type: 'datetime',
+  xAxis: { type: 'Voltage (V)',
     dateTimeLabelFormats: { second: '%H:%M:%S' }
   },
   yAxis: {
-    title: { text: 'Temperature (Celsius)' }
+    title: { text: 'Current (uA)' }
     //title: { text: 'Temperature (Fahrenheit)' }
   },
   credits: { enabled: false }
@@ -65,7 +63,7 @@ setInterval(function ( ) {
       }
     }
   };
-  xhttp.open("GET", "/temperature", true);
+  xhttp.open("GET", "/voltammetry", true);
   xhttp.send();
 }, 300 ) ;
 
