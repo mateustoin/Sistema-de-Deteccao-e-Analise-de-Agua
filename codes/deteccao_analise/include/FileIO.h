@@ -19,7 +19,7 @@ void testFileIO(fs::FS &fs, const char * path);
 
 // Modificações para o projeto de análise Cíclica de Voltametria
 void appendFileVoltammetry(fs::FS &fs, const char * path, const char * voltage, const char * current);
-// Verifica se arquivo já existe
+// Verifica se arquivo já existe. Retorna true se já existe.
 bool verifyFile(fs::FS &fs, const char * path);
 
 #endif

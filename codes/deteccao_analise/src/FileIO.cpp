@@ -151,10 +151,12 @@ void testFileIO(fs::FS &fs, const char * path){
 void appendFileVoltammetry(fs::FS &fs, const char * path, const char * voltage, const char * current){
     //Serial.printf("Appending to file: %s\r\n", path);
 
-    if (verifyFile(fs, path)){
+    /*if (verifyFile(fs, path)){
         Serial.println("Arquivo já existe");
         return;
-    }
+    }else{
+        writeFile(fs, path, "");
+    }*/
 
     File file = fs.open(path, FILE_APPEND);
     if(!file){
@@ -169,7 +171,7 @@ void appendFileVoltammetry(fs::FS &fs, const char * path, const char * voltage, 
         Serial.println("- append failed");
     }
 
-    String infoTemp = current + String("\n");
+    infoTemp = current + String("\n");
     if(file.print(String(infoTemp))){
         Serial.println("- message appended");
     } else{
