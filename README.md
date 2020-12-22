@@ -264,12 +264,177 @@ Obs.: Os valores de corrente simulados para essa situação foram baseados no tr
 
 Siga estas instruções para criar, replicar e modificar o modelo de app na sua máquina. 
 
-<h3 id='pre_req'>Pré-requisitos</h3>
+<h1 id='bonus'>Features Bônus</h3>
 
-<h3 id='instalacao'>Instalação</h3>
+Diversas abordagens podem ser tomadas para o desenvolvimento dessas features. Desde bancos de dados NoSQL até SQL, com diagramas ER (Entidade-Relacionamento) para exemplificar. Entretanto, devido a limitação de tempo Foram utilizadas tecnologias um pouco mais rápidas, mas também muito poderosas. Para a construção do Banco de Dados para armazenamento dos arquivos e coleta de dados para criação de tabelas CSV e gráficos, foi escolhido o *Real Time Database* do *Firebase*, que é uma plataforma de serviços do google que pode ser diretamente integrado com a ESP32.
 
-<h2 id="uso">Uso</h2>
+Para o desenvolvimento de uma versão final do produto foi idealizado a construção de uma API, que seria o intermediário perfeito para uma aplicação desktop ou Web para controle e gerenciamento das coletas de dados, além da requisição de dados para exibição e organização. 
 
+<h2 id='bonus1'><b>Permitir que o operador do hardware possa utilizar a técnica de voltametria
+cíclica para análise da substância aquosa</b></h2>
+
+Para esta feature, a coleta de dados é realizada diretamente da ESP32 e armazenada em sua memória interna. A memória interna possui espaço suficiente para muitas coletas, então memso que não haja conexão com internet ou com algum computador, é possível realizar as coletas necessárias e recuperá-las depois. A seguinte função foi desenvolvida para realizar a análise e armazenamento:
+
+```cpp
+void startVoltammetry(int time_interval, float min_voltage, float max_voltage, String fileName);
+```
+
+O tempo de intervalo (*time_interval*) pode variar para se atingir melhores resultados, visto que, dependendo deste intervalo, a tensão de saída pode variar por causa do filtro RC passa-baixo. O tempo de subida e descida da tensão podem variar conforme o intervalo, melhorando ou piorando a qualidade da coleta. Já os parâmetros *min_voltage* e *max_voltage* dizem respeito a variação de tensão que se deseja obter como entrada na solução, para que os eletrodos gerem a diferença de potencial necessária. Por último o *fileName* é responsável por nomear o arquivo que serão guardados todos os dados da coleta.
+
+```cpp
+void startVoltammetry(int time_interval, float min_voltage, float max_voltage){
+	// Verifica se os parâmetros passados para variação de tensão condizem com a realidade
+	if (min_voltage < 0){
+		Serial.println("Min Voltage must be 0!");
+		return;
+	}else if(min_voltage > 3){
+		Serial.println("Min Voltage must be lesser than 3!");
+		return;
+	}
+
+	if (max_voltage > 3.3){
+		Serial.println("Max Voltage must be 3.3!");
+		return;
+	}else if(max_voltage < 0.3){
+		Serial.println("Max Voltage must be higher than 0.3!");
+		return;
+	}
+
+	// Cria arquivo na memória interna para armazenar todos os dados da coleta
+	if (verifyFile(SPIFFS, fileName)){
+		return;
+	}
+	
+	// Determina os valores de duty cycle para atender a tensão de variação de saída requerida
+	int min_duty_cycle = map(min_voltage, 0.0, 3.3, 0.0, 255.0);
+	int max_duty_cycle = map(max_voltage, 0.0, 3.3, 0.0, 255.0);
+
+	int voltageValue = 0;
+	double currentValue = 0.0;
+
+	/*
+	// Cria contadores para determinar o fim da coleta de dados
+	int current_counter = 0;
+	int counter_limit = max_duty_cycle - min_duty_cycle;
+
+	Lógica do millis pode ser utilizada para criar uma função não bloqueante futuramente
+
+	int init_time = millis();
+	int end_time = init_time;
+	*/
+
+	// Realiza variação de tensão positivamente na saída e coleta dados
+	for (int i = min_duty_cycle; i <= max_duty_cycle; i++){
+		ledcWrite(pwm_channel, i);
+		delay(intervalCollect);
+		// Coleta dados de corrente e tensão de acordo com tabela verdade da corrente
+		voltageValue = analogRead(pinReadSignal);
+		if (voltageValue > 511){
+			currentValue = mapfloat(voltageValue, 512, 1023, 0.0, 0.0002);
+		}else{
+			currentValue = (-1)*mapfloat(voltageValue, 0, 511, 0.0, 0.0002);
+		}
+
+		// Salvando dados na memória interna no arquivo refernete ao fileName
+		appendFileVoltammetry(SPIFFS, fileName, String(voltageValue).c_str(), String(currentValue).c_str());
+	}
+
+	// Realiza variação de tensão negativamente na saída e coleta dados
+	for (int i = max_duty_cycle; i >= min_duty_cycle; i--){
+		ledcWrite(pwm_channel, i);
+		delay(intervalCollect);
+		// Coleta dados de corrente e tensão de acordo com tabela verdade da corrente
+		voltageValue = analogRead(pinReadSignal);
+		if (voltageValue > 511){
+			currentValue = mapfloat(voltageValue, 512, 1023, 0.0, 0.0002);
+		}else{
+			currentValue = (-1)*mapfloat(voltageValue, 0, 511, 0.0, 0.0002);
+		}
+
+		// Salvando dados na memória interna no arquivo refernete ao fileName
+		appendFileVoltammetry(SPIFFS, fileName, String(voltageValue).c_str(), String(currentValue).c_str());
+	}
+}
+```
+
+O resto do código pode ser visto <a src="src/main.cpp">aqui</a>. Foi criada uma função de teste de Voltametria Cíclica, apenas para gerar valores teste para que possam ser utilizadas para integrar com o *Real Time Database* (RDB).
+
+A função a seguir acessa diretamente a memória interna da ESP para pegar os dados coletados e enviar para o banco de dados online. Desta forma é possível conectar os outros serviços para geração de *tabelas CSV* e *Gráficos*.
+
+```cpp
+void sendDataToFirebase(fs::FS &fs, const char* path){
+	/*
+		Esta função é responsável por fazer uma varredura no arquivo de coletas e enviar os dados para o firebase
+	*/
+	Serial.printf("Reading file: %s\r\n", path);
+	String leitura = "";
+	bool voltageUp = true;
+
+    File file = fs.open(path);
+
+    if(!file || file.isDirectory()){
+        Serial.println("- failed to open file for reading");
+        return;
+    }
+
+    Serial.println("- read from file:");
+    while(file.available()){
+		String valor = file.readStringUntil('\n');
+		//Serial.println(valor);
+
+		if (voltageUp){
+			 if(Firebase.pushString(firebaseData, nodeVoltage, valor)){
+				//Success
+				//Serial.println("Set String data success");
+
+			}else{
+				//Failed?, get the error reason from firebaseData
+
+				Serial.print("Error in setInt, ");
+				Serial.println(firebaseData.errorReason());
+			}
+
+			//Serial.println("Voltage: " + valor + "V");
+			voltageUp = false;
+		}else{
+			if(Firebase.pushString(firebaseData, nodeCurrent, valor)){
+				//Success
+				//Serial.println("Set String data success");
+
+			}else{
+				//Failed?, get the error reason from firebaseData
+
+				Serial.print("Error in setInt, ");
+				Serial.println(firebaseData.errorReason());
+			}
+
+			//Serial.println("Current: " + valor + "A");
+			voltageUp = true;
+		}
+    }
+}
+```
+
+Com isso, assim que a varredura da memória é ativada, todos os dados de *Tensão* e *Corrente* resultantes da análise de voltametria cíclica já ficam visíveis na web. Não há necessidade de nenhuma configuração por parte do banco de dados, pois quando há a identificação de novas coletas os nós de dados são criados automaticamente no RDB.
+
+<div align="center">
+    <img width=250 src="img/RDB.gif" alt="descrição da imagem">
+    <p>Figura 10. Banco de Dados sendo atualizado em tempo real com dados de Corrente e Tensão</p>
+    </p>
+</div>
+
+<h2 id='bonus2'>
+<b>Exportar em forma de gráficos os dados de leitura da técnica de
+voltametria cíclica</b>
+</h2>
+
+<h2 id='bonus3'>
+<b>Interface gráfica para operação e visualização do resultado da análise</b>
+</h2>
+
+<h2 id='bonus4'>
+<b>Interface gráfica para operação e visualização do resultado da análise</b>
+</h2>
 
 <h1 id="referencias">Referências Bibliográficas</h1> 
 
