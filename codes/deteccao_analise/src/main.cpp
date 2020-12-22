@@ -7,8 +7,8 @@
 #include <FirebaseESP32.h>
 
 // Informações referentes ao Realtime Database
-#define FIREBASE_HOST "https://cyclic-voltammetry-default-rtdb.firebaseio.com"
-#define FIREBASE_AUTH "Kg1HkINFyGTke9AppSxSlI6LCBW4Ycv6hZErXFLn"
+#define FIREBASE_HOST "https://cyclic-voltammetry-fe847-default-rtdb.firebaseio.com"
+#define FIREBASE_AUTH "hQPiV5ps5XlkKQdjtbAKXVxTGPEt9B1McePULPUf"
 #define WIFI_SSID "24Apt102"
 #define WIFI_PASSWORD "J606165249"
 

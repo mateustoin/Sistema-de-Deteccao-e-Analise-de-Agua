@@ -2,17 +2,23 @@
 
 Elaboração de um projeto capaz de detectar e analisar soluções com a presença de Sal, a fim de utilizar a técnica de Voltametria Cíclica e coletar dados.
 
-## Índice
+# Índice
 + [Sobre](#sobre)
 + [Circuito](#circuito)
 + [Placa de Circuito Impresso](#pcb)
-+ [Primeiros Passos](#comecando)
-    - [Pré-requisitos](#pre_req)
-    - [Instalação](#instalacao)
-+ [Uso](#uso)
+	- [Parte 1](#circuito-pt1)
+	- [Parte 2](#circuito-pt2)
+	- [Parte 3](#circuito-pt3)
+	- [Parte 4](#circuito-pt4)
++ [Features Bônus](#bonus)
+    - [Feature Bônus 1](#bonus1)
+	- [Feature Bônus 2](#bonus2)
+	- [Feature Bônus 3](#bonus3)
+	- [Feature Bônus 4](#bonus4)
++ [Planos Futuros](#futuro)
 + [Referências Bibliográficas](#referencias)
 
-<h2 id="sobre">Sobre</h2>
+<h1 id="sobre">Sobre</h2>
 
 O objetivo desse projeto é realizar a detecção de Sal na água e realizar uma técnica chamada Voltametria Cíclica. A voltametria cíclica consiste em aplicar um potencial sobre o eletrodo de trabalho e medir a corrente elétrica originada pela variação desse potencial. Para isso, foi criado um potenciostato simples, que é um instrumento capaz de realizar a medição de corrente a partir do potencial, mencionado anteriormente. 
 
@@ -27,7 +33,7 @@ O circuito costruído para este experimento, que pode ser visto na figura a segu
 
 Os testes iniciais de validação foram feitos com um Arduino Nano, a fim de validar a saída da placa como sendo funcional para um potenciostato. Para a versão final do circuito, foi selecionada a placa NodeMCU ESP32, visto que para aplicações com coleta de dados, integração com internet, consumo de energia e capacidade de processamento são extremamente superiores as do Arduino. Além disso, algumas de suas características suprem certas necessidades que serão discutidas na seção a seguir.
 
-<h2 id="circuito">Esquemático do Circuito</h2>
+<h1 id="circuito">Esquemático do Circuito</h2>
 
 Para a montagem e simulação do circuito foi utilizado o Software [4]. O uso de um software pago se deu por problemas técnicos e tempo para desenvolvimento. 
 
@@ -49,7 +55,7 @@ O circuito pode ser dividido em partes:
 - Parte 2: Mudança no offset do nível de tensão para se adequar a diferença de potencial necessária
 - Parte 3: Transformar a corrente gerada em tensão
 
-<h3 id='circuito-pt1'><b>Parte 1: Preparo do sinal</b></h3>
+<h2 id='circuito-pt1'><b>Parte 1: Preparo do sinal</b></h3>
 
 Naturalmente uma variação de tensão na saída de uma placa de desenvolvimento se dá através do PWM (do inglês, Modulação por largura de pulso). O PWM gera um sinal com ondas quadradas onde ocorre uma variação apenas no tempo em que a onda passa em nível lógico 1 (conhecido como Duty Cicle). Essa variação, como o próprio nome indica, altera a largura do pulso dado um período de tempo. Um exemplo de sinal com diferentes larguras pode ser visto a seguir:
 
@@ -116,7 +122,7 @@ void loop() {
 }
 ```
 
-<h3 id='circuito-pt2'><b>Parte 2: Mudança do offset</b></h3>
+<h2 id='circuito-pt2'><b>Parte 2: Mudança do offset</b></h3>
 
 A mudança no offset é necessária para o funcionamento do potenciostato, pois tensões negativas são necessárias para que as variações de um ciclo possam ir do pico negativo até o pico positivo de corrente. Essa saída vai diretamente para os eletrodos de trabalho (WE, do inglês Working Electrode) e eletrodo de referência (RE, do inglês Reference Electrode). 
 
@@ -139,7 +145,7 @@ O circuito de offset possui um potênciometro para que possam ocorrer ajustes na
     </p>
 </div>
 
-<h3 id='circuito-pt3'><b>Parte 3: Transformação de corrente em tensão</b></h3>
+<h2 id='circuito-pt3'><b>Parte 3: Transformação de corrente em tensão</b></h3>
 
 Essa fase implica em utilizar um terceiro eletrodo (CE, do inglês Couter Electrode) para captar toda a corrente elétrica gerada pela diferença de potencial dos eletrodos anteriores. Essa corrente, que vai de negativa até positiva, é transformada em tensão para que a placa possa identificar os resultados e gerar gráficos, para assim finalizar a análise do processo.
 
@@ -176,7 +182,7 @@ Os cálculos foram feitos para que, de acordo com a tensão de entrada e resisto
 
 Obs.: Os valores de corrente simulados para essa situação foram baseados no trabalho de [1], visto que, de acordo com a solução testada, as variações de tensão entre -1V e 1V foram utilizadas, já que eram o suficiente para a análise dos resultados pretendidos. Visto que a situação simulada não seria diferente, foram utilizados os mesmos valores como parâmetros para cálculos e testes de simulação.
 
-<h3 id='circuito-pt4'><b>Lista de Materiais</b></h3>
+<h2 id='circuito-pt4'><b>Lista de Materiais</b></h3>
 
 <div align='center'>
     <div>
@@ -259,10 +265,6 @@ Obs.: Os valores de corrente simulados para essa situação foram baseados no tr
     <p>Figura 9. Design e placa de circuito impresso</p>
     </p>
 </div>
-
-<h2 id="comecando">Começando</h2>
-
-Siga estas instruções para criar, replicar e modificar o modelo de app na sua máquina. 
 
 <h1 id='bonus'>Features Bônus</h3>
 
@@ -428,13 +430,140 @@ Com isso, assim que a varredura da memória é ativada, todos os dados de *Tens�
 voltametria cíclica</b>
 </h2>
 
+A geração de gráficos e tabelas CSV ficariam inclusos na Interface Gráfica. Devido ao tempo limitado, foram desenvolvidos como serviços separados em um Script em python, que substitui a API que integraria todas as partes do sistema. Dito isso, o acesso ao Firebase é feito diretamente do código, com a configuração do projeto e acesso aos nós de dados. As bibliotecas utilizadas para o acesso e geração de gráficos foram *pyrebase* e *matplotlib*.
+
+```python
+# Importa bibliotecas
+import pyrebase
+import matplotlib.pyplot as plt
+
+# Todas as informações de configuração para acessar o Real Time Database
+firebaseConfig = {
+    "apiKey": "AIzaSyBEHvCZQpcogdq1o_9BEPW3xgh9Tq0vdB4",
+    "authDomain": "cyclic-voltammetry-fe847.firebaseapp.com",
+    "databaseURL": "https://cyclic-voltammetry-fe847-default-rtdb.firebaseio.com",
+    "projectId": "cyclic-voltammetry-fe847",
+    "storageBucket": "cyclic-voltammetry-fe847.appspot.com",
+    "messagingSenderId": "183536016835",
+    "appId": "1:183536016835:web:cdec2eb19b14ed6b8e7176"
+}
+
+# Inicializa instância do Firebase e cria um objeto do Banco de Dados
+firebase=pyrebase.initialize_app(firebaseConfig)
+
+db=firebase.database()
+
+# Acessa os nós do Banco de Dados que contém os dados enviados pela ESP
+result_voltage = db.child("coletas").child("voltage").get()
+result_current = db.child("coletas").child("current").get()
+
+voltage_data = []
+current_data = []
+
+for value in result_voltage.each():
+    voltage_data.append(value.val())
+
+for value in result_current.each():
+    current_data.append(value.val())
+
+# Configura gráfico para exibir os dados
+plt.title("Gráfico teste Voltametria Cíclica")
+
+#plt.scatter(voltage_data, current_data, color='darkblue', marker='x')
+plt.plot(voltage_data, current_data)
+
+plt.xlabel("Voltage (V)")
+plt.ylabel("Current (A)")
+
+plt.grid(True)
+
+plt.show()
+```
+
+Para este exemplo de geração de gráficos, dados aleatórios foram gerados pela ESP e enviados ao Banco de Dados para testes. Portanto **os valores a seguir não correspondem a uma análise de voltametria cíclica**, servem apenas para mostrar que após a análise a obtenção dos dados e exibição dos mesmos em gráficos é totalmente possível. A figura pode ser vista a seguir:
+
+<div align="center">
+    <img src="img/voltametria-teste-rdb.png" alt="descrição da imagem">
+    <p>Figura 11. Dados aleatórios gerados pela ESP para fins de simulação do envio de dados e obtenção no RDB</p>
+    </p>
+</div>
+
 <h2 id='bonus3'>
-<b>Interface gráfica para operação e visualização do resultado da análise</b>
+<b>Exportar em forma de arquivo CSV os dados de leitura da técnica de
+voltametria cíclica</b>
 </h2>
+
+A geração da tabela segue os mesmos princípios de funcionamento dos gráficos. Seria um sistema integrado, mas foi implementado separadamente para demonstrar o funcionamento extraindo dados direto do RDB. Esses dados que por sua vez foram gerados na ESP, que seriam pegos diretamente do resultado de uma análise voltamétrica. A seguir pode ser visto o código, parecido com o anterior, mas com a geração de tabelas CSV.
+
+```python
+# Importa bibliotecas
+import pyrebase
+import matplotlib.pyplot as plt
+
+# Todas as informações de configuração para acessar o Real Time Database
+firebaseConfig = {
+    "apiKey": "AIzaSyBEHvCZQpcogdq1o_9BEPW3xgh9Tq0vdB4",
+    "authDomain": "cyclic-voltammetry-fe847.firebaseapp.com",
+    "databaseURL": "https://cyclic-voltammetry-fe847-default-rtdb.firebaseio.com",
+    "projectId": "cyclic-voltammetry-fe847",
+    "storageBucket": "cyclic-voltammetry-fe847.appspot.com",
+    "messagingSenderId": "183536016835",
+    "appId": "1:183536016835:web:cdec2eb19b14ed6b8e7176"
+}
+
+# Inicializa instância do Firebase e cria um objeto do Banco de Dados
+firebase=pyrebase.initialize_app(firebaseConfig)
+
+db=firebase.database()
+
+# Acessa os nós do Banco de Dados que contém os dados enviados pela ESP
+result_voltage = db.child("coletas").child("voltage").get()
+result_current = db.child("coletas").child("current").get()
+
+voltage_data = []
+current_data = []
+
+for value in result_voltage.each():
+    voltage_data.append(value.val())
+
+for value in result_current.each():
+    current_data.append(value.val())
+
+# Cria colunas com os dados extraídos do RDB
+df = pd.DataFrame({'Coleta1-tensão':voltage_data,
+                   'Coleta1-corrente':current_data})
+                  
+# Salva tabela
+df.to_csv('voltametria.csv')
+```
+
+Um gif foi gerado para mostrar como é rápido e simples para a formação de tabelas.
+
+<div align="center">
+    <img width=250 src="img/firebase-to-csv.gif" alt="descrição da imagem">
+    <p>Figura 12. Geração de tabela CSV a partir do RDB</p>
+    </p>
+</div>
 
 <h2 id='bonus4'>
 <b>Interface gráfica para operação e visualização do resultado da análise</b>
 </h2>
+
+Infelizmente não foi possível finalizar a interface gráfica, porém ela foi idealizada e pode ser explicada. O sistema final iria possuir uma API capaz de oferecer os serviços de geração de dados para gráficos, tabelas CSV e quaisquer outros que pudessem ser requeridos. Esses serviços seriam fornecidos no formato de microsserviços, a fim de fornecer uma maior versatilidade na construção do produto e evolução, ajudando também na manutenção do sistema.
+
+A interface gráfica poderia ser feita utilizando frameworks multiplataforma como Qt, Electron, entre outros, porém a decisão escolhida para o projeto e para o tempo limitado foi uma página Web fornecida diretamente em um WebServer com a ESP32. Essa página Web seria simples, com um gráfico para exibição dos resultados da análise de voltametria, com botões para iniciar análise, parar, atualizar gráfico e alterar nome da análise. A página começou a ser feita, tinha capacidade para receber dados e exibir um gráfico em tempo real, porém não foram implementados os botões e suas funcionalidades. Uma figura do protótipo funcional ainda em desenvolvimento pode ser visto a seguir:
+
+<div align="center">
+    <img src="img/pagina-web-server.png" alt="descrição da imagem">
+    <p>Figura 13. Página Web para interface gráfica em estágio inicial de desenvolvimento</p>
+    </p>
+</div>
+
+<h1 id="futuro">Planos Futuros</h1>
+
+Além do desenvolvimento da API para oferecer o projeto através de microsserviços, uma outra possibilidade de melhoria seria utilizar RTOS (Real Time Operational System) para Microcontroladores, suportado pela ESP32. A ESP32 é Dual Core, isso significa que possui paralelismo real de processamento e além de barata, poderia ser utilizada em diversas situações, dependendo de como o sistema será aplicado na prática. Desde conexão local a conexão remota, ela seria capaz de processar os dados, se conectar com a web, enquanto fornece outros serviços locais. É uma placa poderosa, com baixo consumo de energia e pode ser utilizada para diversos fins. Além do WiFi possui também Bluetooth, permitindo que também possa ser conectada a aplicativos offline.
+
+Algumas melhorias também podem ser feitas no circuito, visto que a entrada de tensão para alimentação do ICVS (parte responsável por transformar corrente em tensão) pode ser reaproveitada do próprio Circuito ou ESP. Além disso, algumas melhorias também podem ser feitas em relação ao Off-Set da tensão de saída do Filtro, deixando-o mais variável para alterações em tempo real.
 
 <h1 id="referencias">Referências Bibliográficas</h1> 
 
